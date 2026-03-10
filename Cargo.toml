@@ -19,8 +19,8 @@ edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/orellius/laminae"
 description = "The missing layer between raw LLMs and production AI"
-keywords = ["ai", "llm", "safety", "personality", "guardrails"]
-categories = ["api-bindings", "development-tools"]
+keywords = ["ai", "llm", "safety", "guardrails", "security"]
+categories = ["development-tools"]
 
 [workspace.dependencies]
 # Benchmarking

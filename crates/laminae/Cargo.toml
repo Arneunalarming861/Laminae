@@ -6,8 +6,10 @@ license.workspace = true
 repository.workspace = true
 readme = "README.md"
 description = "The missing layer between raw LLMs and production AI — personality, safety, sandboxing, containment"
-keywords = ["ai", "llm", "safety", "personality", "guardrails"]
-categories = ["api-bindings", "development-tools"]
+homepage = "https://github.com/orellius/laminae"
+documentation = "https://docs.rs/laminae"
+keywords = ["ai", "llm", "safety", "guardrails", "security"]
+categories = ["development-tools"]
 
 [features]
 default = []

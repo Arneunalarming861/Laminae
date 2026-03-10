@@ -11,13 +11,14 @@
   <a href="https://crates.io/crates/laminae"><img src="https://img.shields.io/crates/d/laminae.svg" alt="downloads" /></a>
   <a href="https://github.com/orellius/laminae/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
   <a href="https://github.com/orellius/laminae"><img src="https://img.shields.io/badge/rust-1.75%2B-orange.svg" alt="rust" /></a>
+  <a href="https://docs.rs/laminae"><img src="https://docs.rs/laminae/badge.svg" alt="docs.rs" /></a>
 </p>
 
 <p align="center">
   If you find Laminae useful, consider giving it a ⭐ — it helps others discover the project!
 </p>
 
-Laminae (Latin: *layers*) is a modular Rust SDK that adds personality, voice, safety, learning, and containment to any AI application. Each layer works independently or together as a full stack.
+Laminae (Latin: *layers*) is an open-source modular Rust SDK that adds guardrails, safety, personality, voice, learning, and containment to any AI or LLM application. Each layer works independently or together as a full production-ready stack.
 <p align="center">
 
 ```
