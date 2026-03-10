@@ -22,6 +22,7 @@ use crate::model::Persona;
 ///         updated_at: Utc::now(),
 ///         source: PersonaSource::Manual,
 ///         samples_analyzed: 0,
+///         quality: None,
 ///     },
 ///     identity: PersonaIdentity {
 ///         bio: "A Rust developer".into(),
@@ -158,6 +159,7 @@ mod tests {
                 updated_at: Utc::now(),
                 source: PersonaSource::Extracted,
                 samples_analyzed: 50,
+                quality: None,
             },
             identity: PersonaIdentity {
                 bio: "A systems engineer who ships fast".into(),
@@ -241,6 +243,7 @@ mod tests {
                 updated_at: Utc::now(),
                 source: PersonaSource::Manual,
                 samples_analyzed: 0,
+                quality: None,
             },
             identity: PersonaIdentity::default(),
             voice: PersonaVoice {

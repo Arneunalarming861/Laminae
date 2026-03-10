@@ -36,6 +36,28 @@ pub struct PersonaMeta {
     pub source: PersonaSource,
     /// Number of text samples analyzed.
     pub samples_analyzed: usize,
+    /// Quality metrics from the extraction process.
+    #[serde(default)]
+    pub quality: Option<ExtractionQuality>,
+}
+
+/// Quality metrics produced during persona extraction.
+///
+/// Gives callers a quantitative measure of how much to trust the extracted persona.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExtractionQuality {
+    /// Overall confidence in the extraction (0.0–1.0).
+    /// Based on sample count, diversity, and content richness.
+    pub confidence: f64,
+    /// How diverse the input samples are (0.0–1.0).
+    /// Low diversity means samples are too similar to extract a reliable persona.
+    pub diversity_score: f64,
+    /// Average word count across samples.
+    pub avg_sample_length: f64,
+    /// Number of samples that were too short to be useful (< 10 words).
+    pub short_samples: usize,
+    /// Human-readable warnings about extraction quality.
+    pub warnings: Vec<String>,
 }
 
 /// How a persona was created.

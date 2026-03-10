@@ -2,9 +2,17 @@
 
 use anyhow::{Context, Result};
 use chrono::Utc;
+use std::collections::HashSet;
 
 use crate::model::*;
 use laminae_ollama::OllamaClient;
+
+/// Minimum number of samples required for extraction.
+const MIN_SAMPLES: usize = 3;
+/// Recommended number of samples for high-quality extraction.
+const RECOMMENDED_SAMPLES: usize = 5;
+/// Minimum word count for a sample to be considered useful.
+const MIN_SAMPLE_WORDS: usize = 10;
 
 /// Extracts a writing persona from text samples using a local LLM.
 ///
@@ -41,10 +49,22 @@ impl PersonaExtractor {
         }
     }
 
-    /// Extract a persona from unweighted text samples.
+    /// Extract a persona from text samples.
+    ///
+    /// Requires at least 3 samples. Recommends 5+ for high-confidence extraction.
+    /// Returns the extracted persona with quality metrics attached.
     pub async fn extract(&self, samples: &[WeightedSample]) -> Result<Persona> {
         if samples.is_empty() {
             anyhow::bail!("Cannot extract persona from zero samples");
+        }
+        if samples.len() < MIN_SAMPLES {
+            anyhow::bail!(
+                "Need at least {} samples for extraction (got {}). \
+                 Provide {} or more for best results.",
+                MIN_SAMPLES,
+                samples.len(),
+                RECOMMENDED_SAMPLES,
+            );
         }
 
         // Sort by weight (highest first) and cap at max_samples
@@ -55,6 +75,21 @@ impl PersonaExtractor {
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
         sorted.truncate(self.max_samples);
+
+        // Compute quality metrics before extraction
+        let quality = compute_extraction_quality(&sorted);
+
+        if quality.confidence < 0.2 {
+            tracing::warn!(
+                confidence = quality.confidence,
+                diversity = quality.diversity_score,
+                "Very low extraction confidence — persona may be unreliable"
+            );
+        } else if !quality.warnings.is_empty() {
+            for w in &quality.warnings {
+                tracing::info!("Extraction quality: {}", w);
+            }
+        }
 
         let samples_text = sorted
             .iter()
@@ -100,6 +135,7 @@ impl PersonaExtractor {
                 updated_at: now,
                 source: PersonaSource::Extracted,
                 samples_analyzed: sorted.len(),
+                quality: Some(quality),
             },
             identity: PersonaIdentity {
                 bio: extracted.bio,
@@ -185,6 +221,83 @@ fn compute_similarity(a: &PersonaVoice, b: &PersonaVoice) -> f64 {
     };
 
     tone_jaccard * 0.5 + style_overlap * 0.5
+}
+
+/// Compute quality metrics for a set of samples before extraction.
+fn compute_extraction_quality(samples: &[&WeightedSample]) -> ExtractionQuality {
+    let mut warnings = Vec::new();
+
+    // Count short samples
+    let word_counts: Vec<usize> = samples
+        .iter()
+        .map(|s| s.text.split_whitespace().count())
+        .collect();
+    let short_samples = word_counts.iter().filter(|&&c| c < MIN_SAMPLE_WORDS).count();
+    let avg_sample_length = if word_counts.is_empty() {
+        0.0
+    } else {
+        word_counts.iter().sum::<usize>() as f64 / word_counts.len() as f64
+    };
+
+    if short_samples > samples.len() / 2 {
+        warnings.push(format!(
+            "{} of {} samples are very short (<{} words) — extraction may miss nuance",
+            short_samples,
+            samples.len(),
+            MIN_SAMPLE_WORDS,
+        ));
+    }
+
+    // Diversity: unique words / total words across all samples (type-token ratio)
+    let mut all_words = Vec::new();
+    let mut unique_words = HashSet::new();
+    for s in samples {
+        for word in s.text.split_whitespace() {
+            let lower = word.to_lowercase();
+            let cleaned: String = lower.chars().filter(|c| c.is_alphanumeric()).collect();
+            if cleaned.len() >= 2 {
+                all_words.push(cleaned.clone());
+                unique_words.insert(cleaned);
+            }
+        }
+    }
+
+    let diversity_score = if all_words.is_empty() {
+        0.0
+    } else {
+        // Normalized type-token ratio (raw TTR drops with corpus size,
+        // so we cap to give meaningful 0-1 range)
+        let raw_ttr = unique_words.len() as f64 / all_words.len() as f64;
+        (raw_ttr * 2.0).min(1.0) // Scale: 0.5 raw TTR → 1.0 score
+    };
+
+    if diversity_score < 0.3 {
+        warnings.push(
+            "Low vocabulary diversity — samples may be too similar to each other".to_string(),
+        );
+    }
+
+    if samples.len() < RECOMMENDED_SAMPLES {
+        warnings.push(format!(
+            "Only {} samples provided (recommend {}+ for high confidence)",
+            samples.len(),
+            RECOMMENDED_SAMPLES,
+        ));
+    }
+
+    // Overall confidence: weighted combination of factors
+    let count_factor = (samples.len() as f64 / RECOMMENDED_SAMPLES as f64).min(1.0);
+    let useful_ratio = 1.0 - (short_samples as f64 / samples.len().max(1) as f64);
+    let confidence = (count_factor * 0.3 + diversity_score * 0.4 + useful_ratio * 0.3)
+        .clamp(0.0, 1.0);
+
+    ExtractionQuality {
+        confidence,
+        diversity_score,
+        avg_sample_length,
+        short_samples,
+        warnings,
+    }
 }
 
 /// Anti-hallucination: validate that LLM-provided examples are actual copies.
@@ -420,5 +533,68 @@ mod tests {
         let raw = "```json\n{\"tone_words\":[\"sharp\"],\"writing_style\":\"Direct\",\"humor_style\":\"none\",\"emotional_range\":\"flat\",\"sentence_length\":\"short\",\"punctuation_style\":\"minimal\",\"voice_summary\":\"You write bluntly.\",\"bio\":\"A developer\",\"expertise\":[],\"perspective\":\"\",\"example_posts\":[]}\n```";
         let result: Result<ExtractedPersona> = parse_json_response(raw);
         assert!(result.is_ok());
+    }
+
+    // ── Quality scoring tests ───────────────────────────────
+
+    #[test]
+    fn test_quality_high_confidence() {
+        let samples: Vec<WeightedSample> = vec![
+            "Rust is the best systems language. Performance meets safety. No GC pauses ever.".into(),
+            "Ship it first, optimize later. The compiler catches what tests miss.".into(),
+            "Every abstraction has a cost. Make sure you're paying for something real.".into(),
+            "Nobody reads your README. Write code that documents itself through types.".into(),
+            "Hot take: most frameworks are just dependency trees in a trench coat.".into(),
+            "The best code review comment is 'delete this'. Simplicity wins.".into(),
+        ];
+        let refs: Vec<&WeightedSample> = samples.iter().collect();
+        let quality = compute_extraction_quality(&refs);
+
+        assert!(quality.confidence > 0.6, "confidence={}", quality.confidence);
+        assert!(quality.diversity_score > 0.4, "diversity={}", quality.diversity_score);
+        assert_eq!(quality.short_samples, 0);
+        assert!(quality.warnings.is_empty() || quality.warnings.len() <= 1);
+    }
+
+    #[test]
+    fn test_quality_low_diversity() {
+        // Extremely repetitive samples — near-identical structure with same words
+        let samples: Vec<WeightedSample> = vec![
+            "Rust is fast Rust is fast Rust is fast Rust is fast".into(),
+            "Rust is fast Rust is fast Rust is fast Rust is fast".into(),
+            "Rust is fast Rust is fast Rust is fast Rust is fast".into(),
+        ];
+        let refs: Vec<&WeightedSample> = samples.iter().collect();
+        let quality = compute_extraction_quality(&refs);
+
+        assert!(quality.diversity_score < 0.5, "diversity={}", quality.diversity_score);
+    }
+
+    #[test]
+    fn test_quality_short_samples_warning() {
+        let samples: Vec<WeightedSample> = vec![
+            "Short.".into(),
+            "Also short.".into(),
+            "Very short too.".into(),
+            "Tiny.".into(),
+        ];
+        let refs: Vec<&WeightedSample> = samples.iter().collect();
+        let quality = compute_extraction_quality(&refs);
+
+        assert!(quality.short_samples >= 3);
+        assert!(quality.warnings.iter().any(|w| w.contains("short")));
+    }
+
+    #[test]
+    fn test_quality_few_samples_warning() {
+        let samples: Vec<WeightedSample> = vec![
+            "This is a reasonable length sample with enough words to count.".into(),
+            "Another sample that has sufficient length for analysis here.".into(),
+            "Third sample with plenty of words for the extraction engine.".into(),
+        ];
+        let refs: Vec<&WeightedSample> = samples.iter().collect();
+        let quality = compute_extraction_quality(&refs);
+
+        assert!(quality.warnings.iter().any(|w| w.contains("recommend")));
     }
 }
