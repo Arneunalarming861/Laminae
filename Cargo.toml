@@ -7,6 +7,8 @@ members = [
     "crates/laminae-ironclad",
     "crates/laminae-glassbox",
     "crates/laminae-ollama",
+    "crates/laminae-persona",
+    "crates/laminae-cortex",
 ]
 
 [workspace.package]
@@ -46,3 +48,5 @@ laminae-shadow = { version = "0.1.1", path = "crates/laminae-shadow" }
 laminae-ironclad = { version = "0.1.1", path = "crates/laminae-ironclad" }
 laminae-glassbox = { version = "0.1.1", path = "crates/laminae-glassbox" }
 laminae-ollama = { version = "0.1.1", path = "crates/laminae-ollama" }
+laminae-persona = { version = "0.1.1", path = "crates/laminae-persona" }
+laminae-cortex = { version = "0.1.1", path = "crates/laminae-cortex" }

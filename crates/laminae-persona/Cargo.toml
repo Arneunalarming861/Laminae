@@ -1,0 +1,19 @@
+[package]
+name = "laminae-persona"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+description = "Voice persona extraction and style enforcement for LLM output — learns how you write and keeps the AI on-voice"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+regex = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+laminae-ollama = { workspace = true }

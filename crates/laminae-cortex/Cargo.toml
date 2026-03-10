@@ -1,0 +1,18 @@
+[package]
+name = "laminae-cortex"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+description = "Self-improving learning loop for LLM applications — tracks user edits, extracts preferences, builds reusable instructions"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+laminae-ollama = { workspace = true }
