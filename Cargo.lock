@@ -643,7 +643,7 @@ dependencies = [
 
 [[package]]
 name = "laminae"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "futures-util",
@@ -660,7 +660,7 @@ dependencies = [
 
 [[package]]
 name = "laminae-glassbox"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "dirs",
@@ -670,7 +670,7 @@ dependencies = [
 
 [[package]]
 name = "laminae-ironclad"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "laminae-glassbox",
@@ -681,7 +681,7 @@ dependencies = [
 
 [[package]]
 name = "laminae-ollama"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "futures-util",
@@ -694,7 +694,7 @@ dependencies = [
 
 [[package]]
 name = "laminae-psyche"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "dirs",
@@ -707,7 +707,7 @@ dependencies = [
 
 [[package]]
 name = "laminae-shadow"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "dirs",
