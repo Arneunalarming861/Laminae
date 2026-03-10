@@ -14,3 +14,8 @@ laminae-shadow = { workspace = true }
 laminae-ironclad = { workspace = true }
 laminae-glassbox = { workspace = true }
 laminae-ollama = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
