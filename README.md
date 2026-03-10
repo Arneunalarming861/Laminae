@@ -229,33 +229,64 @@ gb.validate_output("The weather is sunny.")?;            // OK
 ```toml
 # Full stack
 [dependencies]
-laminae = "0.2"
+laminae = "0.3"
 tokio = { version = "1", features = ["full"] }
 
 # With first-class LLM backends
 [dependencies]
-laminae = { version = "0.2", features = ["anthropic"] }  # Claude
-laminae = { version = "0.2", features = ["openai"] }     # OpenAI / Groq / Together / DeepSeek / local
-laminae = { version = "0.2", features = ["all-backends"] }
+laminae = { version = "0.3", features = ["anthropic"] }  # Claude
+laminae = { version = "0.3", features = ["openai"] }     # OpenAI / Groq / Together / DeepSeek / local
+laminae = { version = "0.3", features = ["all-backends"] }
 
 # Or pick individual layers
 [dependencies]
-laminae-psyche = "0.2"       # Just the cognitive pipeline
-laminae-persona = "0.2"      # Just voice extraction & enforcement
-laminae-cortex = "0.2"       # Just the learning loop
-laminae-shadow = "0.2"       # Just the red-teaming
-laminae-glassbox = "0.2"     # Just the containment
-laminae-ironclad = "0.2"     # Just the sandbox
-laminae-ollama = "0.2"       # Just the Ollama client
-laminae-anthropic = "0.2"    # Claude EgoBackend
-laminae-openai = "0.2"       # OpenAI-compatible EgoBackend
+laminae-psyche = "0.3"       # Just the cognitive pipeline
+laminae-persona = "0.3"      # Just voice extraction & enforcement
+laminae-cortex = "0.3"       # Just the learning loop
+laminae-shadow = "0.3"       # Just the red-teaming
+laminae-glassbox = "0.3"     # Just the containment
+laminae-ironclad = "0.3"     # Just the sandbox
+laminae-ollama = "0.3"       # Just the Ollama client
+laminae-anthropic = "0.3"    # Claude EgoBackend
+laminae-openai = "0.3"       # OpenAI-compatible EgoBackend
 ```
+
+## Python Bindings
+
+```bash
+pip install laminae  # via maturin
+```
+
+```python
+from laminae import Glassbox, VoiceFilter, Cortex
+
+gb = Glassbox()
+gb.validate_input("Hello")       # OK
+gb.validate_command("rm -rf /")  # raises ValueError
+
+f = VoiceFilter()
+result = f.check("It's important to note that...")
+# result.passed = False, result.violations = ["AI vocabulary detected: ..."]
+
+c = Cortex()
+c.track_edit("It's worth noting X.", "X.")
+patterns = c.detect_patterns()
+```
+
+## Platform Support
+
+| Platform | Status |
+|----------|--------|
+| macOS | Full support (Seatbelt sandbox) |
+| Linux | Full support (namespaces + seccomp) |
+| Windows | Full support (Job Object sandbox) |
+| WASM | Glassbox, Persona (voice filter), Cortex |
+| Python | Glassbox, VoiceFilter, Cortex via PyO3 |
 
 ## Requirements
 
 - **Rust 1.70+**
 - **Ollama** (for Psyche and Shadow LLM features) — `brew install ollama && ollama serve`
-- **macOS or Linux** (for Ironclad's process sandbox)
 
 ## Examples
 
@@ -291,7 +322,8 @@ laminae (meta-crate, feature-gated backends)
 ├── laminae-glassbox     ← GlassboxLogger trait + validation + rate limiter
 ├── laminae-ollama       ← Standalone Ollama HTTP client
 ├── laminae-anthropic    ← Claude EgoBackend (feature: "anthropic")
-└── laminae-openai       ← OpenAI-compatible EgoBackend (feature: "openai")
+├── laminae-openai       ← OpenAI-compatible EgoBackend (feature: "openai")
+└── laminae-python       ← Python bindings via PyO3 (pip install laminae)
 ```
 
 Each crate is independent except:
@@ -310,7 +342,7 @@ Each crate is independent except:
 | `EgoBackend` | Plug in any LLM | `ClaudeBackend`, `OpenAIBackend` (+ Groq, Together, DeepSeek, local) |
 | `Analyzer` | Add custom Shadow analysis stages | `StaticAnalyzer`, `SecretsAnalyzer`, `DependencyAnalyzer`, `LlmReviewer` |
 | `GlassboxLogger` | Route containment events to your logging system | `TracingLogger` |
-| `SandboxProvider` | Custom process sandboxing | `SeatbeltProvider` (macOS), `LinuxSandboxProvider`, `NoopProvider` |
+| `SandboxProvider` | Custom process sandboxing | `SeatbeltProvider` (macOS), `LinuxSandboxProvider`, `WindowsSandboxProvider`, `NoopProvider` |
 
 ## Author
 
