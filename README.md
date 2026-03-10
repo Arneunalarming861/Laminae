@@ -287,6 +287,28 @@ patterns = c.detect_patterns()
 | WASM | Glassbox, Persona (voice filter), Cortex |
 | Python | Glassbox, VoiceFilter, Cortex via PyO3 |
 
+## Benchmarks
+
+All numbers from Criterion.rs on Apple M3 Pro. Full results in [`BENCHMARKS.md`](BENCHMARKS.md).
+
+| Operation | Time | Crate |
+|-----------|------|-------|
+| `validate_input` (100 chars) | ~396 ns | Glassbox |
+| `validate_command` | ~248 ns | Glassbox |
+| `validate_output` (100 chars) | ~215 ns | Glassbox |
+| `validate_binary` | ~1.1 µs | Ironclad |
+| Voice filter (clean, 100 chars) | ~3.9 µs | Persona |
+| `track_edit` | ~85 ns | Cortex |
+| `detect_patterns` (100 edits) | ~426 µs | Cortex |
+| Static analyzer (10 lines) | ~7.4 ms | Shadow |
+| Secrets analyzer (100 lines) | ~428 µs | Shadow |
+
+Containment (Glassbox) adds <1µs per call — effectively zero overhead on any LLM pipeline.
+
+```bash
+cargo bench --workspace
+```
+
 ## Requirements
 
 - **Rust 1.70+**
