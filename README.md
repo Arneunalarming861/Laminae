@@ -300,6 +300,15 @@ Each crate is independent except:
 | `GlassboxLogger` | Route containment events to your logging system | `TracingLogger` |
 | `SandboxProvider` | Custom process sandboxing | `SeatbeltProvider` (macOS), `LinuxSandboxProvider`, `NoopProvider` |
 
+## Author
+
+Built by [Orel Ohayon](https://orellius.ai) — solo dev building open-source Rust SDKs and developer tools for the AI ecosystem.
+
+- [orellius.ai](https://orellius.ai)
+- [GitHub](https://github.com/orellius)
+- [X](https://x.com/Orellius)
+- [crates.io](https://crates.io/users/orellius)
+
 ## License
 
 Licensed under the Apache License, Version 2.0 — see [LICENSE](LICENSE) for details.
