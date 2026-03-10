@@ -57,6 +57,9 @@ pub use sandbox::SeatbeltProvider;
 #[cfg(target_os = "linux")]
 pub use sandbox::LinuxSandboxProvider;
 
+#[cfg(target_os = "windows")]
+pub use sandbox::WindowsSandboxProvider;
+
 // ══════════════════════════════════════════════════════════
 // 1. COMMAND WHITELIST — Execution Denial
 // ══════════════════════════════════════════════════════════
@@ -503,36 +506,83 @@ struct ProcessStats {
 }
 
 async fn get_process_stats(pid: u32) -> Option<ProcessStats> {
-    let output = tokio::process::Command::new("ps")
-        .args(["-o", "%cpu=,rss=", "-p", &pid.to_string()])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .output()
-        .await
-        .ok()?;
+    #[cfg(unix)]
+    {
+        let output = tokio::process::Command::new("ps")
+            .args(["-o", "%cpu=,rss=", "-p", &pid.to_string()])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .output()
+            .await
+            .ok()?;
 
-    if !output.status.success() {
-        return None;
+        if !output.status.success() {
+            return None;
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let trimmed = stdout.trim();
+        if trimmed.is_empty() {
+            return None;
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 2 {
+            return None;
+        }
+
+        let cpu_percent: f32 = parts[0].parse().unwrap_or(0.0);
+        let rss_kb: u64 = parts[1].parse().unwrap_or(0);
+
+        Some(ProcessStats {
+            cpu_percent,
+            memory_mb: rss_kb / 1024,
+        })
     }
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let trimmed = stdout.trim();
-    if trimmed.is_empty() {
-        return None;
+    #[cfg(windows)]
+    {
+        // Use WMIC to get process CPU and memory stats
+        let output = tokio::process::Command::new("wmic")
+            .args([
+                "process",
+                "where",
+                &format!("ProcessId={pid}"),
+                "get",
+                "WorkingSetSize,PercentProcessorTime",
+                "/format:csv",
+            ])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .output()
+            .await
+            .ok()?;
+
+        if !output.status.success() {
+            return None;
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        // WMIC CSV output: Node,PercentProcessorTime,WorkingSetSize
+        for line in stdout.lines().skip(1) {
+            let parts: Vec<&str> = line.split(',').collect();
+            if parts.len() >= 3 {
+                let cpu_percent: f32 = parts[1].trim().parse().unwrap_or(0.0);
+                let working_set_bytes: u64 = parts[2].trim().parse().unwrap_or(0);
+                return Some(ProcessStats {
+                    cpu_percent,
+                    memory_mb: working_set_bytes / (1024 * 1024),
+                });
+            }
+        }
+        None
     }
 
-    let parts: Vec<&str> = trimmed.split_whitespace().collect();
-    if parts.len() < 2 {
-        return None;
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = pid;
+        None
     }
-
-    let cpu_percent: f32 = parts[0].parse().unwrap_or(0.0);
-    let rss_kb: u64 = parts[1].parse().unwrap_or(0);
-
-    Some(ProcessStats {
-        cpu_percent,
-        memory_mb: rss_kb / 1024,
-    })
 }
 
 fn kill_process_tree(pid: u32, agent_label: &str, reason: &WatchdogKillReason) {
@@ -546,9 +596,26 @@ fn kill_process_tree(pid: u32, agent_label: &str, reason: &WatchdogKillReason) {
         "[IRONCLAD WATCHDOG] Killing process tree for agent '{agent_label}' (PID {pid}): {reason}"
     );
 
+    #[cfg(unix)]
     unsafe {
         libc::kill(-(pid as i32), libc::SIGKILL);
         libc::kill(pid as i32, libc::SIGKILL);
+    }
+
+    #[cfg(windows)]
+    {
+        // taskkill /F /T kills the process tree forcefully
+        let _ = std::process::Command::new("taskkill")
+            .args(["/F", "/T", "/PID", &pid.to_string()])
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+    }
+
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = (pid, agent_label, reason);
+        tracing::warn!("Cannot kill process on this platform");
     }
 }
 

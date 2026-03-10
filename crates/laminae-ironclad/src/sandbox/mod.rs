@@ -14,6 +14,8 @@ mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
 mod noop;
+#[cfg(target_os = "windows")]
+mod windows;
 
 pub use noop::NoopProvider;
 
@@ -22,6 +24,9 @@ pub use macos::SeatbeltProvider;
 
 #[cfg(target_os = "linux")]
 pub use linux::LinuxSandboxProvider;
+
+#[cfg(target_os = "windows")]
+pub use windows::WindowsSandboxProvider;
 
 /// Describes the network access policy for a sandboxed process.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -105,7 +110,12 @@ pub fn default_provider() -> Box<dyn SandboxProvider> {
         Box::new(LinuxSandboxProvider)
     }
 
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    #[cfg(target_os = "windows")]
+    {
+        Box::new(WindowsSandboxProvider)
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
     {
         Box::new(NoopProvider)
     }
