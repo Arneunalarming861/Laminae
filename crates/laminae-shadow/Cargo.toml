@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+readme = "README.md"
 description = "Adversarial red-teaming engine for AI output — static analysis, LLM review, sandbox execution"
 
 [dependencies]

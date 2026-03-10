@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+readme = "README.md"
 description = "Input/output containment layer for AI agents — rate limiting, command blocklists, immutable zones"
 
 [dependencies]
