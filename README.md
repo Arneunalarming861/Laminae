@@ -22,6 +22,10 @@
   <a href="https://docs.orellius.ai/laminae/introduction"><strong>📖 Documentation</strong></a> · <a href="https://github.com/orellius/laminae/blob/main/CHANGELOG.md"><strong>Changelog</strong></a>
 </p>
 
+<p align="center">
+  <a href="https://orellius.ai"><strong>Made with ❤️ for AIs and for the Vibe Coding Community.</strong></a>
+</p>
+
 Laminae (Latin: *layers*) is an open-source modular Rust SDK that adds guardrails, safety, personality, voice, learning, and containment to any AI or LLM application. Each layer works independently or together as a full production-ready stack.
 <p align="center">
 
@@ -388,7 +392,3 @@ Built by [Orel Ohayon](https://orellius.ai) - solo dev building open-source Rust
 Licensed under the Apache License, Version 2.0 - see [LICENSE](LICENSE) for details.
 
 Copyright 2026 Orel Ohayon.
-
----
-
-<p align="center">Made with ❤️ for AIs and for the Community.</p>
