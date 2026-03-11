@@ -970,7 +970,6 @@ dependencies = [
 name = "laminae-python"
 version = "0.3.1"
 dependencies = [
- "chrono",
  "laminae-cortex",
  "laminae-glassbox",
  "laminae-persona",

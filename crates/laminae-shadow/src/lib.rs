@@ -320,7 +320,6 @@ impl ShadowEngine {
                 static_run,
                 llm_run,
                 sandbox_run,
-                healing_suggestion: None,
                 clean,
                 summary,
             };

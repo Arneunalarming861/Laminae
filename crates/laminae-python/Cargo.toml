@@ -15,4 +15,3 @@ pyo3 = { version = "0.23", features = ["extension-module"] }
 laminae-glassbox = { workspace = true }
 laminae-persona = { workspace = true }
 laminae-cortex = { workspace = true }
-chrono = { workspace = true }

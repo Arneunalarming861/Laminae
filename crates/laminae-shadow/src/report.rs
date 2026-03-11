@@ -93,13 +93,6 @@ pub struct VulnFinding {
     pub source: AnalysisSource,
 }
 
-/// Suggestion for automated self-healing.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HealingSuggestion {
-    pub description: String,
-    pub patched_snippet: Option<String>,
-}
-
 /// Complete report from a Shadow analysis run.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VulnReport {
@@ -111,7 +104,6 @@ pub struct VulnReport {
     pub static_run: bool,
     pub llm_run: bool,
     pub sandbox_run: bool,
-    pub healing_suggestion: Option<HealingSuggestion>,
     pub clean: bool,
     pub summary: String,
 }
@@ -128,7 +120,6 @@ impl VulnReport {
             static_run: false,
             llm_run: false,
             sandbox_run: false,
-            healing_suggestion: None,
             clean: true,
             summary: "No vulnerabilities found.".to_string(),
         }

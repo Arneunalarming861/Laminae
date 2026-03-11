@@ -1,7 +1,12 @@
+use tokio::sync::OnceCell;
+
 use crate::analyzer::{Analyzer, AnalyzerError};
 use crate::config::ShadowConfig;
 use crate::extractor::ExtractedBlock;
 use crate::report::{AnalysisSource, VulnCategory, VulnFinding, VulnSeverity};
+
+/// Cached container runtime detection (avoids spawning subprocesses on every call).
+static DETECTED_RUNTIME: OnceCell<Option<&'static str>> = OnceCell::const_new();
 
 /// Sandbox manager for executing code in isolated containers.
 ///
@@ -25,22 +30,26 @@ impl SandboxManager {
         }
     }
 
-    /// Detect which container runtime is available.
+    /// Detect which container runtime is available (cached after first call).
     async fn detect_runtime() -> Option<&'static str> {
-        for runtime in &["docker", "podman"] {
-            if let Ok(status) = tokio::process::Command::new(runtime)
-                .arg("info")
-                .stdout(std::process::Stdio::null())
-                .stderr(std::process::Stdio::null())
-                .status()
-                .await
-            {
-                if status.success() {
-                    return Some(runtime);
+        *DETECTED_RUNTIME
+            .get_or_init(|| async {
+                for runtime in &["docker", "podman"] {
+                    if let Ok(status) = tokio::process::Command::new(runtime)
+                        .arg("info")
+                        .stdout(std::process::Stdio::null())
+                        .stderr(std::process::Stdio::null())
+                        .status()
+                        .await
+                    {
+                        if status.success() {
+                            return Some(*runtime);
+                        }
+                    }
                 }
-            }
-        }
-        None
+                None
+            })
+            .await
     }
 
     /// Run a single code block in an ephemeral container and collect findings.

@@ -71,6 +71,20 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo check --workspace --exclude laminae-python
 
+  python:
+    name: Python Bindings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build Python wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: crates/laminae-python
+          command: build
+          args: --release
+
   fmt:
     name: Format
     runs-on: ubuntu-latest
