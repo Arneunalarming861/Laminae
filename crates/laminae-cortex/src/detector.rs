@@ -96,158 +96,112 @@ pub fn detect_patterns(edits: &[&EditRecord], min_frequency_pct: f64) -> Vec<Edi
 
     let mut patterns = Vec::new();
 
-    // Pattern 1: Shortened (removed 20%+ of text)
-    let shortened: Vec<_> = edits.iter().filter(|e| e.removal_pct() >= 20.0).collect();
-    if !shortened.is_empty() {
-        let freq = shortened.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::Shortened,
-                frequency_pct: freq,
-                count: shortened.len(),
-                examples: shortened
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::Shortened,
+        |e| e.removal_pct() >= 20.0,
+        &mut patterns,
+    );
 
-    // Pattern 2: Removed trailing question
-    let removed_q: Vec<_> = edits
-        .iter()
-        .filter(|e| e.original.trim().ends_with('?') && !e.edited.trim().ends_with('?'))
-        .collect();
-    if !removed_q.is_empty() {
-        let freq = removed_q.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::RemovedQuestion,
-                frequency_pct: freq,
-                count: removed_q.len(),
-                examples: removed_q
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::RemovedQuestion,
+        |e| e.original.trim().ends_with('?') && !e.edited.trim().ends_with('?'),
+        &mut patterns,
+    );
 
-    // Pattern 3: Removed opener (first sentence rewritten, <30% overlap)
-    let removed_opener: Vec<_> = edits
-        .iter()
-        .filter(|e| {
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::RemovedOpener,
+        |e| {
             let orig_first = first_sentence(&e.original);
             let edit_first = first_sentence(&e.edited);
             word_overlap(orig_first, edit_first) < 0.3
-        })
-        .collect();
-    if !removed_opener.is_empty() {
-        let freq = removed_opener.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::RemovedOpener,
-                frequency_pct: freq,
-                count: removed_opener.len(),
-                examples: removed_opener
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+        },
+        &mut patterns,
+    );
 
-    // Pattern 4: Removed AI phrases
-    let removed_ai: Vec<_> = edits
-        .iter()
-        .filter(|e| {
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::RemovedAiPhrases,
+        |e| {
             let orig_lower = e.original.to_lowercase();
             let edit_lower = e.edited.to_lowercase();
             AI_TELL_PHRASES
                 .iter()
                 .any(|phrase| orig_lower.contains(phrase) && !edit_lower.contains(phrase))
-        })
-        .collect();
-    if !removed_ai.is_empty() {
-        let freq = removed_ai.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::RemovedAiPhrases,
-                frequency_pct: freq,
-                count: removed_ai.len(),
-                examples: removed_ai
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+        },
+        &mut patterns,
+    );
 
-    // Pattern 5: Added content (30%+ expansion)
-    let added: Vec<_> = edits.iter().filter(|e| e.addition_pct() >= 30.0).collect();
-    if !added.is_empty() {
-        let freq = added.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::AddedContent,
-                frequency_pct: freq,
-                count: added.len(),
-                examples: added
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::AddedContent,
+        |e| e.addition_pct() >= 30.0,
+        &mut patterns,
+    );
 
-    // Pattern 6: Tone shifted softer
-    let softer: Vec<_> = edits
-        .iter()
-        .filter(|e| tone_shift(&e.original, &e.edited) == ToneShift::Softer)
-        .collect();
-    if !softer.is_empty() {
-        let freq = softer.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::ChangedToneSofter,
-                frequency_pct: freq,
-                count: softer.len(),
-                examples: softer
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::ChangedToneSofter,
+        |e| tone_shift(&e.original, &e.edited) == ToneShift::Softer,
+        &mut patterns,
+    );
 
-    // Pattern 7: Tone shifted stronger
-    let stronger: Vec<_> = edits
-        .iter()
-        .filter(|e| tone_shift(&e.original, &e.edited) == ToneShift::Stronger)
-        .collect();
-    if !stronger.is_empty() {
-        let freq = stronger.len() as f64 / total as f64 * 100.0;
-        if freq >= min_frequency_pct {
-            patterns.push(EditPattern {
-                pattern_type: PatternType::ChangedToneStronger,
-                frequency_pct: freq,
-                count: stronger.len(),
-                examples: stronger
-                    .iter()
-                    .take(3)
-                    .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
-                    .collect(),
-            });
-        }
-    }
+    collect_pattern(
+        edits,
+        total,
+        min_frequency_pct,
+        PatternType::ChangedToneStronger,
+        |e| tone_shift(&e.original, &e.edited) == ToneShift::Stronger,
+        &mut patterns,
+    );
 
     patterns
+}
+
+/// Build an [`EditPattern`] from matching edits and push it onto `out` if the
+/// computed frequency meets `min_frequency_pct`.
+fn collect_pattern<F>(
+    edits: &[&EditRecord],
+    total: usize,
+    min_frequency_pct: f64,
+    pattern_type: PatternType,
+    predicate: F,
+    out: &mut Vec<EditPattern>,
+) where
+    F: Fn(&&EditRecord) -> bool,
+{
+    let matched: Vec<_> = edits.iter().filter(|e| predicate(e)).collect();
+    if matched.is_empty() {
+        return;
+    }
+    let freq = matched.len() as f64 / total as f64 * 100.0;
+    if freq < min_frequency_pct {
+        return;
+    }
+    out.push(EditPattern {
+        pattern_type,
+        frequency_pct: freq,
+        count: matched.len(),
+        examples: matched
+            .iter()
+            .take(3)
+            .map(|e| (truncate(&e.original, 80), truncate(&e.edited, 80)))
+            .collect(),
+    });
 }
 
 #[derive(PartialEq)]

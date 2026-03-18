@@ -128,6 +128,23 @@ impl VulnReport {
     }
 }
 
+/// Deduplicate findings in-place by (category, title, evidence).
+///
+/// Findings with the same category, title, and evidence are collapsed into one.
+/// The input is sorted as a side effect of the deduplication.
+pub fn dedup_findings(findings: &mut Vec<VulnFinding>) {
+    findings.sort_by(|a, b| {
+        a.category
+            .to_string()
+            .cmp(&b.category.to_string())
+            .then(a.title.cmp(&b.title))
+            .then(a.evidence.cmp(&b.evidence))
+    });
+    findings.dedup_by(|a, b| {
+        a.category == b.category && a.title == b.title && a.evidence == b.evidence
+    });
+}
+
 /// Build a human-readable summary from findings.
 pub fn build_summary(
     findings: &[VulnFinding],

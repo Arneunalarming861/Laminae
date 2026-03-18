@@ -5,7 +5,7 @@ use regex::Regex;
 use thiserror::Error;
 
 use crate::extractor::ExtractedBlock;
-use crate::report::{AnalysisSource, VulnCategory, VulnFinding, VulnSeverity};
+use crate::report::{dedup_findings, AnalysisSource, VulnCategory, VulnFinding, VulnSeverity};
 use crate::scanner;
 
 /// Internal error type for individual analyzer stages.
@@ -677,17 +677,7 @@ impl Analyzer for StaticAnalyzer {
             }
         }
 
-        // Deduplicate (by category + title + evidence to avoid collapsing different rules)
-        findings.sort_by(|a, b| {
-            a.category
-                .to_string()
-                .cmp(&b.category.to_string())
-                .then(a.title.cmp(&b.title))
-                .then(a.evidence.cmp(&b.evidence))
-        });
-        findings.dedup_by(|a, b| {
-            a.category == b.category && a.title == b.title && a.evidence == b.evidence
-        });
+        dedup_findings(&mut findings);
 
         Ok(findings)
     }

@@ -46,7 +46,7 @@ use std::time::{Duration, Instant};
 use anyhow::Result;
 use tokio::process::Command;
 
-use laminae_glassbox::{log_glassbox_event, Severity};
+use laminae_glassbox::{log_glassbox_event, truncate, Severity};
 
 pub mod sandbox;
 pub use sandbox::{default_provider, NetworkPolicy, NoopProvider, SandboxProfile, SandboxProvider};
@@ -678,18 +678,6 @@ fn kill_process_tree(pid: u32, agent_label: &str, reason: &WatchdogKillReason) {
     {
         let _ = (pid, agent_label, reason);
         tracing::warn!("Cannot kill process on this platform");
-    }
-}
-
-fn truncate(s: &str, max: usize) -> &str {
-    if s.len() <= max {
-        s
-    } else {
-        let mut end = max;
-        while end > 0 && !s.is_char_boundary(end) {
-            end -= 1;
-        }
-        &s[..end]
     }
 }
 

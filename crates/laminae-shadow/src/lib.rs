@@ -62,7 +62,7 @@ pub use config::ShadowConfig;
 use analyzer::{Analyzer, StaticAnalyzer};
 use extractor::CodeBlockExtractor;
 use llm_reviewer::LlmReviewer;
-use report::{build_summary, VulnReport, VulnSeverity};
+use report::{build_summary, dedup_findings, VulnReport, VulnSeverity};
 use sandbox::SandboxManager;
 
 use laminae_ollama::OllamaClient;
@@ -292,17 +292,7 @@ impl ShadowEngine {
                 }
             }
 
-            // Deduplicate
-            all_findings.sort_by(|a, b| {
-                a.category
-                    .to_string()
-                    .cmp(&b.category.to_string())
-                    .then(a.title.cmp(&b.title))
-                    .then(a.evidence.cmp(&b.evidence))
-            });
-            all_findings.dedup_by(|a, b| {
-                a.category == b.category && a.title == b.title && a.evidence == b.evidence
-            });
+            dedup_findings(&mut all_findings);
 
             let max_severity = all_findings
                 .iter()

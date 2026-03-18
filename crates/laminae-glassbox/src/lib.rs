@@ -551,7 +551,10 @@ fn normalize_path(path: &str) -> String {
     result.to_string_lossy().to_string()
 }
 
-fn truncate(s: &str, max: usize) -> &str {
+/// Truncate a string slice at a char boundary no greater than `max` bytes.
+///
+/// Returns the original slice unchanged when `s.len() <= max`.
+pub fn truncate(s: &str, max: usize) -> &str {
     if s.len() <= max {
         s
     } else {
