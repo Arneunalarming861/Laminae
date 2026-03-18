@@ -1,0 +1,91 @@
+# Publish all Rust crates to crates.io on version tag push.
+# Requires CARGO_REGISTRY_TOKEN secret set in GitHub repo Settings > Secrets > Actions.
+#
+# Crates are published in dependency order with a 30-second delay between each
+# to allow the crates.io index to propagate before dependents are published.
+name: Publish Crates
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+jobs:
+  test:
+    name: Pre-publish tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --exclude laminae-python
+
+  publish:
+    name: Publish to crates.io
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # Tier 1 — no internal dependencies
+      - name: Publish laminae-glassbox
+        run: cargo publish -p laminae-glassbox
+      - name: Wait for index propagation
+        run: sleep 30
+
+      # Tier 2 — depends on glassbox
+      - name: Publish laminae-ironclad
+        run: cargo publish -p laminae-ironclad
+      - name: Wait for index propagation
+        run: sleep 30
+
+      # Tier 3 — no internal dependencies (leaf crate)
+      - name: Publish laminae-ollama
+        run: cargo publish -p laminae-ollama
+      - name: Wait for index propagation
+        run: sleep 30
+
+      # Tier 4 — depends on ollama
+      - name: Publish laminae-psyche
+        run: cargo publish -p laminae-psyche
+      - name: Wait for index propagation
+        run: sleep 30
+
+      - name: Publish laminae-persona
+        run: cargo publish -p laminae-persona
+      - name: Wait for index propagation
+        run: sleep 30
+
+      - name: Publish laminae-cortex
+        run: cargo publish -p laminae-cortex
+      - name: Wait for index propagation
+        run: sleep 30
+
+      - name: Publish laminae-shadow
+        run: cargo publish -p laminae-shadow
+      - name: Wait for index propagation
+        run: sleep 30
+
+      # Tier 5 — depends on psyche
+      - name: Publish laminae-anthropic
+        run: cargo publish -p laminae-anthropic
+      - name: Wait for index propagation
+        run: sleep 30
+
+      - name: Publish laminae-openai
+        run: cargo publish -p laminae-openai
+      - name: Wait for index propagation
+        run: sleep 30
+
+      # Tier 6 — umbrella crate, depends on everything
+      - name: Publish laminae
+        run: cargo publish -p laminae
