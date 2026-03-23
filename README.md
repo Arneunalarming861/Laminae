@@ -26,6 +26,17 @@
   <a href="https://orellius.ai"><strong>Made with ❤️ for AIs and for the Vibe Coding Community.</strong></a>
 </p>
 
+---
+
+> **This project has been archived.** The most valuable components (Cortex, Glassbox, Ironclad) have been absorbed into [Thunder](https://github.com/Orellius/Thunder) — our AI-powered multi-agent coding orchestrator. The ideas live on in a product that ships.
+
+> **What was absorbed:**
+> - **laminae-cortex** (learning from corrections) → Thunder's Stormeye memory layer
+> - **laminae-glassbox** (I/O containment) → [Thunder Dome](https://github.com/Orellius/thunder-dome) security gateway
+> - **laminae-ironclad** (process sandbox) → Thunder's agent process safety
+
+---
+
 Laminae (Latin: *layers*) is an open-source modular Rust SDK that adds guardrails, safety, personality, voice, learning, and containment to any AI or LLM application. Each layer works independently or together as a full production-ready stack.
 <p align="center">
 
@@ -405,3 +416,17 @@ Built by [Orel Ohayon](https://orellius.ai) - solo dev building open-source Rust
 Licensed under the Apache License, Version 2.0 - see [LICENSE](LICENSE) for details.
 
 Copyright 2026 Orel Ohayon.
+
+---
+
+<p align="center">
+  <strong>Laminae's ideas live on in the Thunder ecosystem:</strong><br/>
+  <a href="https://github.com/Orellius/Thunder">Thunder</a> ·
+  <a href="https://github.com/Orellius/thunder-dome">Thunder Dome</a> ·
+  <a href="https://github.com/Orellius/thunder-thinking">Thunder Thinking</a> ·
+  <a href="https://github.com/Orellius/thunder-eye">Thunder Eye</a>
+</p>
+
+<p align="center">
+  Built by <a href="https://orellius.ai"><strong>Orellius.ai</strong></a>
+</p>
