@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://crates.io/crates/laminae"><img src="https://img.shields.io/crates/v/laminae.svg" alt="crates.io" /></a>
-  <a href="https://crates.io/crates?q=laminae"><img src="https://img.shields.io/badge/crates.io_downloads-1.0K-e6822a" alt="SDK downloads" /></a>
+  <a href="https://crates.io/crates?q=laminae"><img src="https://img.shields.io/badge/crates.io_downloads-1.3K-e6822a" alt="SDK downloads" /></a>
   <a href="https://github.com/orellius/laminae/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
   <a href="https://github.com/orellius/laminae"><img src="https://img.shields.io/badge/rust-1.83%2B-orange.svg" alt="rust" /></a>
   <a href="https://docs.rs/laminae"><img src="https://docs.rs/laminae/badge.svg" alt="docs.rs" /></a>
